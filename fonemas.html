@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🗣️ Fonemas</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap');
+
+:root {
+  --bg:#FFF8EE;
+  --card:#fff;
+  --shadow:0 4px 20px rgba(0,0,0,.1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;overflow-x:hidden;}
+
+/* ── HEADER ── */
+#app-header{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 20px;background:#fff;
+  box-shadow:0 3px 12px rgba(0,0,0,.1);
+  position:sticky;top:0;z-index:200;
+}
+#back-btn{
+  display:none;width:52px;height:52px;border-radius:50%;border:none;
+  background:#FF6B6B;color:#fff;font-size:1.6rem;cursor:pointer;
+  box-shadow:0 4px 10px rgba(255,107,107,.4);flex-shrink:0;
+  align-items:center;justify-content:center;transition:transform .15s;
+}
+#back-btn:active{transform:scale(.92);}
+#app-title{font-family:'Fredoka One',cursive;font-size:1.6rem;color:#444;flex:1;}
+#edit-btn{
+  width:48px;height:48px;border-radius:50%;border:none;
+  background:#f0f0f0;font-size:1.4rem;cursor:pointer;
+  flex-shrink:0;transition:all .15s;
+  display:flex;align-items:center;justify-content:center;
+}
+#edit-btn:hover{background:#FFD93D;}
+
+/* ── CONSONANT MENU ── */
+#menu{padding:20px 16px 32px;max-width:800px;margin:0 auto;}
+#menu h2{
+  font-family:'Fredoka One',cursive;font-size:1.3rem;
+  color:#888;margin-bottom:16px;text-align:center;
+}
+.consonant-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(72px,1fr));
+  gap:12px;
+}
+.cons-btn{
+  aspect-ratio:1/1;border-radius:18px;border:none;cursor:pointer;
+  font-family:'Fredoka One',cursive;font-size:1.8rem;color:#fff;
+  box-shadow:0 5px 0 rgba(0,0,0,.18),0 8px 18px rgba(0,0,0,.1);
+  transition:transform .12s,box-shadow .12s;
+  display:flex;align-items:center;justify-content:center;
+}
+.cons-btn:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.18),0 3px 8px rgba(0,0,0,.1);}
+
+/* ── SYLLABLE SCREEN ── */
+#syllable-screen{
+  display:none;padding:16px 16px 40px;
+  max-width:800px;margin:0 auto;
+}
+#syllable-screen.active{display:block;}
+
+.syl-header{
+  display:flex;align-items:center;gap:14px;
+  margin-bottom:20px;
+}
+.syl-cons-badge{
+  font-family:'Fredoka One',cursive;font-size:2rem;color:#fff;
+  width:64px;height:64px;border-radius:18px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 12px rgba(0,0,0,.2);
+}
+.syl-title{font-family:'Fredoka One',cursive;font-size:1.3rem;color:#666;}
+
+/* syllable cards row */
+.syl-tabs{
+  display:flex;gap:10px;justify-content:center;flex-wrap:wrap;
+  margin-bottom:20px;
+}
+.syl-tab{
+  font-family:'Fredoka One',cursive;font-size:1.4rem;
+  padding:10px 20px;border:none;border-radius:50px;
+  cursor:pointer;color:#fff;
+  box-shadow:0 4px 0 rgba(0,0,0,.18);
+  transition:all .13s;opacity:.65;
+}
+.syl-tab.active{opacity:1;transform:scale(1.08);box-shadow:0 6px 0 rgba(0,0,0,.22);}
+.syl-tab:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.18);}
+
+/* word card */
+.word-card{
+  background:#fff;border-radius:28px;
+  padding:28px 20px;text-align:center;
+  box-shadow:0 6px 28px rgba(0,0,0,.1);
+  animation:cardIn .3s cubic-bezier(.34,1.56,.64,1);
+  min-height:320px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+}
+@keyframes cardIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+
+.word-img{
+  width:180px;height:180px;object-fit:contain;
+  border-radius:20px;
+  background:#f9f9f9;
+  padding:8px;
+}
+.word-img-placeholder{
+  width:180px;height:180px;border-radius:20px;
+  background:linear-gradient(135deg,#f0f0f0,#e0e0e0);
+  display:flex;align-items:center;justify-content:center;
+  font-size:5rem;
+}
+.word-syllable{
+  font-family:'Fredoka One',cursive;font-size:3.5rem;
+  line-height:1;
+}
+.word-label{
+  font-family:'Fredoka One',cursive;font-size:1.6rem;color:#555;
+}
+.word-label .hl{color:inherit;text-decoration:underline;text-underline-offset:4px;}
+
+/* speak button */
+.speak-btn{
+  font-family:'Fredoka One',cursive;font-size:1rem;
+  padding:12px 28px;border:none;border-radius:50px;color:#fff;
+  cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.2);
+  transition:all .13s;margin-top:4px;
+}
+.speak-btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.2);}
+
+/* word list under card */
+.more-words{
+  margin-top:16px;
+  display:flex;flex-wrap:wrap;gap:10px;justify-content:center;
+}
+.more-word-btn{
+  font-family:'Fredoka One',cursive;font-size:1rem;
+  padding:8px 18px;border:none;border-radius:50px;
+  background:#f0f0f0;color:#555;cursor:pointer;
+  box-shadow:0 3px 0 rgba(0,0,0,.1);transition:all .13s;
+}
+.more-word-btn.active-word{background:#444;color:#fff;}
+.more-word-btn:active{transform:translateY(2px);}
+
+/* ── PIN MODAL ── */
+#pin-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.55);backdrop-filter:blur(4px);
+  z-index:500;align-items:center;justify-content:center;
+}
+#pin-overlay.active{display:flex;}
+.pin-box{
+  background:#fff;border-radius:28px;padding:32px 28px;
+  text-align:center;width:min(340px,90vw);
+  box-shadow:0 20px 60px rgba(0,0,0,.25);
+  animation:cardIn .3s cubic-bezier(.34,1.56,.64,1);
+}
+.pin-box h2{font-family:'Fredoka One',cursive;font-size:1.6rem;color:#444;margin-bottom:8px;}
+.pin-box p{color:#888;font-size:.95rem;margin-bottom:20px;}
+.pin-dots{display:flex;gap:12px;justify-content:center;margin-bottom:24px;}
+.pin-dot{
+  width:18px;height:18px;border-radius:50%;
+  background:#eee;transition:background .2s;
+}
+.pin-dot.filled{background:#4D96FF;}
+.pin-numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.pin-key{
+  aspect-ratio:1/1;border-radius:16px;border:none;
+  font-family:'Fredoka One',cursive;font-size:1.6rem;
+  background:#f5f5f5;color:#333;cursor:pointer;
+  box-shadow:0 3px 0 rgba(0,0,0,.12);transition:all .12s;
+}
+.pin-key:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.12);}
+.pin-key.del{background:#FFE0E0;color:#FF6B6B;}
+.pin-key.ok{background:#6BCB77;color:#fff;}
+.pin-error{color:#FF6B6B;font-family:'Fredoka One',cursive;font-size:1rem;min-height:24px;margin-top:8px;}
+
+/* ── EDITOR PANEL ── */
+#editor-panel{
+  display:none;position:fixed;inset:0;
+  background:var(--bg);z-index:400;overflow-y:auto;
+}
+#editor-panel.active{display:block;}
+.editor-header{
+  display:flex;align-items:center;gap:14px;
+  padding:16px 20px;background:#fff;
+  box-shadow:0 3px 12px rgba(0,0,0,.1);
+  position:sticky;top:0;z-index:10;
+}
+.editor-header h2{font-family:'Fredoka One',cursive;font-size:1.4rem;color:#444;flex:1;}
+.editor-close{
+  width:48px;height:48px;border-radius:50%;border:none;
+  background:#FF6B6B;color:#fff;font-size:1.4rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.editor-body{padding:20px 16px 40px;max-width:700px;margin:0 auto;}
+
+.editor-cons-select{
+  display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;
+}
+.editor-cons-btn{
+  font-family:'Fredoka One',cursive;font-size:1.1rem;
+  padding:8px 16px;border:none;border-radius:50px;
+  cursor:pointer;background:#f0f0f0;color:#555;
+  transition:all .13s;
+}
+.editor-cons-btn.sel{color:#fff;}
+
+.editor-syl-section{margin-bottom:28px;}
+.editor-syl-title{
+  font-family:'Fredoka One',cursive;font-size:1.2rem;color:#666;
+  margin-bottom:12px;display:flex;align-items:center;gap:10px;
+}
+.editor-syl-badge{
+  font-family:'Fredoka One',cursive;font-size:1rem;color:#fff;
+  padding:4px 14px;border-radius:50px;
+}
+
+.word-row{
+  display:flex;align-items:center;gap:10px;
+  background:#fff;border-radius:16px;padding:12px 14px;
+  margin-bottom:8px;box-shadow:0 2px 8px rgba(0,0,0,.07);
+}
+.word-row input{
+  flex:1;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;
+  border:2px solid #eee;border-radius:10px;padding:6px 10px;
+  outline:none;transition:border-color .2s;
+}
+.word-row input:focus{border-color:#4D96FF;}
+.word-row input.img-input{color:#888;font-size:.9rem;}
+.word-row-del{
+  width:36px;height:36px;border-radius:50%;border:none;
+  background:#FFE0E0;color:#FF6B6B;font-size:1.1rem;
+  cursor:pointer;flex-shrink:0;transition:all .13s;
+}
+.word-row-del:active{transform:scale(.9);}
+.add-word-btn{
+  font-family:'Fredoka One',cursive;font-size:.95rem;
+  padding:9px 20px;border:none;border-radius:50px;
+  background:#4D96FF;color:#fff;cursor:pointer;
+  box-shadow:0 3px 0 rgba(0,0,0,.2);margin-top:4px;
+  transition:all .13s;
+}
+.add-word-btn:active{transform:translateY(2px);}
+.save-btn{
+  font-family:'Fredoka One',cursive;font-size:1.1rem;
+  padding:14px 36px;border:none;border-radius:50px;
+  background:#6BCB77;color:#fff;cursor:pointer;
+  box-shadow:0 5px 0 rgba(0,0,0,.2);
+  width:100%;margin-top:8px;transition:all .13s;
+}
+.save-btn:active{transform:translateY(3px);}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(120px);
+  font-family:'Fredoka One',cursive;font-size:1.4rem;
+  padding:12px 32px;border-radius:50px;
+  background:#6BCB77;color:#fff;
+  box-shadow:0 8px 24px rgba(0,0,0,.2);
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+  z-index:999;pointer-events:none;white-space:nowrap;
+}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.bad{background:#FF6B6B;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:420px){
+  .consonant-grid{grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:8px;}
+  .cons-btn{font-size:1.5rem;border-radius:14px;}
+  .word-img,.word-img-placeholder{width:140px;height:140px;}
+  .word-syllable{font-size:2.8rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="app-header">
+  <button id="back-btn" onclick="goMenu()">◀</button>
+  <div id="app-title">🗣️ Fonemas</div>
+  <button id="edit-btn" onclick="openPIN()" title="Editar palabras">✏️</button>
+</div>
+
+<!-- CONSONANT MENU -->
+<div id="menu">
+  <h2>Elige una letra</h2>
+  <div class="consonant-grid" id="consonant-grid"></div>
+</div>
+
+<!-- SYLLABLE SCREEN -->
+<div id="syllable-screen">
+  <div class="syl-header">
+    <div class="syl-cons-badge" id="syl-badge"></div>
+    <div class="syl-title" id="syl-title"></div>
+  </div>
+  <div class="syl-tabs" id="syl-tabs"></div>
+  <div class="word-card" id="word-card"></div>
+  <div class="more-words" id="more-words"></div>
+</div>
+
+<!-- PIN MODAL -->
+<div id="pin-overlay">
+  <div class="pin-box">
+    <h2>🔒 Editar palabras</h2>
+    <p>Introduce el código</p>
+    <div class="pin-dots" id="pin-dots">
+      <div class="pin-dot"></div>
+      <div class="pin-dot"></div>
+      <div class="pin-dot"></div>
+      <div class="pin-dot"></div>
+    </div>
+    <div class="pin-numpad">
+      <button class="pin-key" onclick="pinPress('1')">1</button>
+      <button class="pin-key" onclick="pinPress('2')">2</button>
+      <button class="pin-key" onclick="pinPress('3')">3</button>
+      <button class="pin-key" onclick="pinPress('4')">4</button>
+      <button class="pin-key" onclick="pinPress('5')">5</button>
+      <button class="pin-key" onclick="pinPress('6')">6</button>
+      <button class="pin-key" onclick="pinPress('7')">7</button>
+      <button class="pin-key" onclick="pinPress('8')">8</button>
+      <button class="pin-key" onclick="pinPress('9')">9</button>
+      <button class="pin-key del" onclick="pinDel()">⌫</button>
+      <button class="pin-key" onclick="pinPress('0')">0</button>
+      <button class="pin-key" onclick="closePIN()">✕</button>
+    </div>
+    <div class="pin-error" id="pin-error"></div>
+  </div>
+</div>
+
+<!-- EDITOR PANEL -->
+<div id="editor-panel">
+  <div class="editor-header">
+    <h2>✏️ Editar palabras</h2>
+    <button class="editor-close" onclick="closeEditor()">✕</button>
+  </div>
+  <div class="editor-body">
+    <p style="color:#888;font-size:.9rem;margin-bottom:14px;">
+      Toca una letra para editar sus palabras. El nombre de la imagen debe coincidir exactamente con el archivo en la carpeta <strong>imagenes/</strong>.
+    </p>
+    <div class="editor-cons-select" id="editor-cons-select"></div>
+    <div id="editor-content"></div>
+    <button class="save-btn" onclick="saveEdits()">💾 Guardar cambios</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ════ DATA ════
+   Base data — always present.
+   localStorage stores extra words added by editor, merged at runtime.
+*/
+const PIN = '1234'; // ← cambia este PIN
+
+const CONSONANTS = ['B','C','D','F','G','J','L','M','N','P','R','S','T','V','Y','Z'];
+
+// Colors per consonant
+const CCOLORS = {
+  B:'#FF6B6B',C:'#FF922B',D:'#FFCA3A',F:'#6BCB77',
+  G:'#20C997',J:'#4D96FF',L:'#CC5DE8',M:'#F06595',
+  N:'#74C0FC',P:'#FF6B6B',R:'#FF922B',S:'#6BCB77',
+  T:'#4D96FF',V:'#CC5DE8',Y:'#20C997',Z:'#F06595'
+};
+
+const VOWELS = ['A','E','I','O','U'];
+
+// Base words — one per syllable minimum
+const BASE_DATA = {
+  B:{ A:[{p:'bañera',i:'bañera.png'}], E:[{p:'bebé',i:'bebe.png'}], I:[{p:'bici',i:'bici.png'}], O:[{p:'boca',i:'boca.png'}], U:[{p:'burro',i:'burro.png'}] },
+  C:{ A:[{p:'casa',i:'casa.png'}], E:[{p:'cesta',i:'cesta.png'}], I:[{p:'cine',i:'cine.png'}], O:[{p:'coche',i:'coche.png'}], U:[{p:'cubo',i:'cubo.png'}] },
+  D:{ A:[{p:'dado',i:'dado.png'}], E:[{p:'dedo',i:'dedo.png'}], I:[{p:'divertido',i:'divertido.png'}], O:[{p:'dominó',i:'domino.png'}], U:[{p:'ducha',i:'ducha.png'}] },
+  F:{ A:[{p:'faro',i:'faro.png'}], E:[{p:'fecha',i:'fecha.png'}], I:[{p:'fila',i:'fila.png'}], O:[{p:'foca',i:'foca.png'}], U:[{p:'fuego',i:'fuego.png'}] },
+  G:{ A:[{p:'gato',i:'gato.png'}], E:[{p:'gel',i:'gel.png'}], I:[{p:'gimnasia',i:'gimnasia.png'}], O:[{p:'gorro',i:'gorro.png'}], U:[{p:'gusano',i:'gusano.png'}] },
+  J:{ A:[{p:'jabón',i:'jabon.png'}], E:[{p:'jersey',i:'jersey.png'}], I:[{p:'jirafa',i:'jirafa.png'}], O:[{p:'Jorge',i:'jorge.png'}], U:[{p:'jugo',i:'jugo.png'}] },
+  L:{ A:[{p:'lápiz',i:'lapiz.png'}], E:[{p:'leche',i:'leche.png'}], I:[{p:'lima',i:'lima.png'}], O:[{p:'lobo',i:'lobo.png'}], U:[{p:'luna',i:'luna.png'}] },
+  M:{ A:[{p:'mano',i:'mano.png'}], E:[{p:'mesa',i:'mesa.png'}], I:[{p:'miel',i:'miel.png'}], O:[{p:'mono',i:'mono.png'}], U:[{p:'mula',i:'mula.png'}] },
+  N:{ A:[{p:'nariz',i:'nariz.png'}], E:[{p:'nieve',i:'nieve.png'}], I:[{p:'niño',i:'nino.png'}], O:[{p:'noche',i:'noche.png'}], U:[{p:'nube',i:'nube.png'}] },
+  P:{ A:[{p:'pato',i:'pato.png'}], E:[{p:'pera',i:'pera.png'}], I:[{p:'pino',i:'pino.png'}], O:[{p:'pollo',i:'pollo.png'}], U:[{p:'pulpo',i:'pulpo.png'}] },
+  R:{ A:[{p:'rana',i:'rana.png'}], E:[{p:'resta',i:'resta.png'}], I:[{p:'río',i:'rio.png'}], O:[{p:'rosa',i:'rosa.png'}], U:[{p:'rueda',i:'rueda.png'}] },
+  S:{ A:[{p:'sala',i:'sala.png'}], E:[{p:'sello',i:'sello.png'}], I:[{p:'silla',i:'silla.png'}], O:[{p:'sol',i:'sol.png'}], U:[{p:'suelo',i:'suelo.png'}] },
+  T:{ A:[{p:'taza',i:'taza.png'}], E:[{p:'tela',i:'tela.png'}], I:[{p:'tigre',i:'tigre.png'}], O:[{p:'tos',i:'tos.png'}], U:[{p:'tubo',i:'tubo.png'}] },
+  V:{ A:[{p:'vaca',i:'vaca.png'}], E:[{p:'vela',i:'vela.png'}], I:[{p:'villa',i:'villa.png'}], O:[{p:'volcán',i:'volcan.png'}], U:[{p:'vuelo',i:'vuelo.png'}] },
+  Y:{ A:[{p:'yate',i:'yate.png'}], E:[{p:'yema',i:'yema.png'}], I:[{p:'yogur',i:'yogur.png'}], O:[{p:'yogur',i:'yogur.png'}], U:[{p:'yuca',i:'yuca.png'}] },
+  Z:{ A:[{p:'zapato',i:'zapato.png'}], E:[{p:'zebra',i:'zebra.png'}], I:[{p:'ciervo',i:'ciervo.png'}], O:[{p:'zorro',i:'zorro.png'}], U:[{p:'zumo',i:'zumo.png'}] }
+};
+
+/* ════ MERGE BASE + localStorage ════ */
+function getData(){
+  const extra = JSON.parse(localStorage.getItem('fonemas_extra') || '{}');
+  const merged = {};
+  CONSONANTS.forEach(c => {
+    merged[c] = {};
+    VOWELS.forEach(v => {
+      const base = (BASE_DATA[c]&&BASE_DATA[c][v]) ? [...BASE_DATA[c][v]] : [];
+      const add  = (extra[c]&&extra[c][v])         ? extra[c][v]          : [];
+      merged[c][v] = [...base, ...add];
+    });
+  });
+  return merged;
+}
+
+function saveExtra(extra){
+  localStorage.setItem('fonemas_extra', JSON.stringify(extra));
+}
+
+/* ════ AUDIO ════ */
+const AC = new(window.AudioContext||window.webkitAudioContext)();
+function playTone(f=440,dur=0.4){
+  AC.resume();
+  const o=AC.createOscillator(),g=AC.createGain();
+  o.connect(g);g.connect(AC.destination);
+  o.type='sine';o.frequency.value=f;
+  g.gain.setValueAtTime(.35,AC.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+dur);
+  o.start();o.stop(AC.currentTime+dur);
+}
+function speak(txt){
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(txt);
+  u.lang='es-ES';u.rate=0.8;u.pitch=1.2;
+  speechSynthesis.speak(u);
+}
+
+/* ════ STATE ════ */
+let currentCons='';
+let currentVowel='A';
+let currentWordIdx=0;
+
+/* ════ BUILD CONSONANT MENU ════ */
+function buildMenu(){
+  const grid=document.getElementById('consonant-grid');
+  grid.innerHTML='';
+  CONSONANTS.forEach(c=>{
+    const btn=document.createElement('button');
+    btn.className='cons-btn';
+    btn.style.background=`linear-gradient(135deg,${CCOLORS[c]},${CCOLORS[c]}cc)`;
+    btn.textContent=c;
+    btn.onclick=()=>openConsonant(c);
+    grid.appendChild(btn);
+  });
+}
+
+/* ════ OPEN CONSONANT ════ */
+function openConsonant(c){
+  currentCons=c;
+  currentVowel='A';
+  currentWordIdx=0;
+  document.getElementById('menu').style.display='none';
+  const ss=document.getElementById('syllable-screen');
+  ss.classList.add('active');
+  document.getElementById('back-btn').style.display='flex';
+
+  const badge=document.getElementById('syl-badge');
+  badge.style.background=CCOLORS[c];
+  badge.textContent=c;
+  document.getElementById('syl-title').textContent=`Sílabas con ${c}`;
+
+  buildTabs(c);
+  showSyllable(c,'A');
+}
+
+function goMenu(){
+  document.getElementById('menu').style.display='block';
+  document.getElementById('syllable-screen').classList.remove('active');
+  document.getElementById('back-btn').style.display='none';
+}
+
+/* ════ SYLLABLE TABS ════ */
+function buildTabs(c){
+  const tabs=document.getElementById('syl-tabs');
+  tabs.innerHTML='';
+  VOWELS.forEach(v=>{
+    const btn=document.createElement('button');
+    btn.className='syl-tab'+(v==='A'?' active':'');
+    btn.style.background=CCOLORS[c];
+    btn.textContent=c+v;
+    btn.onclick=()=>{
+      currentVowel=v;currentWordIdx=0;
+      document.querySelectorAll('.syl-tab').forEach(t=>t.classList.remove('active'));
+      btn.classList.add('active');
+      showSyllable(c,v);
+      playTone(330,0.3);
+    };
+    tabs.appendChild(btn);
+  });
+}
+
+/* ════ SHOW SYLLABLE ════ */
+function showSyllable(c,v){
+  const data=getData();
+  const words=(data[c]&&data[c][v])||[];
+  const syl=c+v;
+  const color=CCOLORS[c];
+
+  // word card
+  const card=document.getElementById('word-card');
+  if(words.length===0){
+    card.innerHTML=`<div style="color:#ccc;font-family:'Fredoka One',cursive;font-size:1.3rem;">Sin palabras todavía</div>`;
+    document.getElementById('more-words').innerHTML='';
+    return;
+  }
+
+  const w=words[currentWordIdx]||words[0];
+  renderWordCard(card,w,syl,color);
+  speak(syl + '... ' + w.p);
+
+  // more words buttons
+  const mw=document.getElementById('more-words');
+  mw.innerHTML='';
+  if(words.length>1){
+    words.forEach((wd,idx)=>{
+      const btn=document.createElement('button');
+      btn.className='more-word-btn'+(idx===currentWordIdx?' active-word':'');
+      btn.textContent=wd.p;
+      btn.onclick=()=>{
+        currentWordIdx=idx;
+        document.querySelectorAll('.more-word-btn').forEach(b=>b.classList.remove('active-word'));
+        btn.classList.add('active-word');
+        renderWordCard(card,wd,syl,color);
+        speak(syl + '... ' + wd.p);
+      };
+      mw.appendChild(btn);
+    });
+  }
+}
+
+function renderWordCard(card,w,syl,color){
+  const imgPath=`imagenes/${w.i}`;
+  // highlight syllable in word (first occurrence, case-insensitive)
+  const wordLower=w.p.toLowerCase();
+  const sylLower=syl.toLowerCase();
+  let highlighted=w.p;
+  const idx=wordLower.indexOf(sylLower);
+  if(idx!==-1){
+    highlighted=w.p.slice(0,idx)+
+      `<span class="hl" style="color:${color}">${w.p.slice(idx,idx+syl.length)}</span>`+
+      w.p.slice(idx+syl.length);
+  }
+
+  card.style.animation='none';
+  card.offsetHeight; // reflow
+  card.style.animation='';
+
+  card.innerHTML=`
+    <img class="word-img" src="${imgPath}" alt="${w.p}"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="word-img-placeholder" style="display:none">🖼️</div>
+    <div class="word-syllable" style="color:${color}">${syl}</div>
+    <div class="word-label">${highlighted}</div>
+    <button class="speak-btn" style="background:${color}"
+      onclick="speak('${syl}... ${w.p}');playTone(330,.3)">
+      🔊 Escuchar
+    </button>
+  `;
+}
+
+/* ════ PIN ════ */
+let pinBuffer='';
+function openPIN(){
+  pinBuffer='';updatePinDots();
+  document.getElementById('pin-error').textContent='';
+  document.getElementById('pin-overlay').classList.add('active');
+}
+function closePIN(){
+  document.getElementById('pin-overlay').classList.remove('active');
+  pinBuffer='';
+}
+function pinPress(d){
+  if(pinBuffer.length>=4) return;
+  pinBuffer+=d;updatePinDots();
+  if(pinBuffer.length===4){
+    setTimeout(()=>{
+      if(pinBuffer===PIN){ closePIN();openEditor(); }
+      else{
+        document.getElementById('pin-error').textContent='Código incorrecto';
+        pinBuffer='';updatePinDots();
+      }
+    },200);
+  }
+}
+function pinDel(){ pinBuffer=pinBuffer.slice(0,-1);updatePinDots(); }
+function updatePinDots(){
+  document.querySelectorAll('.pin-dot').forEach((d,i)=>{
+    d.classList.toggle('filled',i<pinBuffer.length);
+  });
+}
+
+/* ════ EDITOR ════ */
+let editorCons='B';
+let editorDraft={}; // working copy: only extras
+
+function openEditor(){
+  // load current extras
+  editorDraft=JSON.parse(localStorage.getItem('fonemas_extra')||'{}');
+  CONSONANTS.forEach(c=>{
+    if(!editorDraft[c]) editorDraft[c]={};
+    VOWELS.forEach(v=>{ if(!editorDraft[c][v]) editorDraft[c][v]=[]; });
+  });
+
+  // build consonant selector
+  const sel=document.getElementById('editor-cons-select');
+  sel.innerHTML='';
+  CONSONANTS.forEach(c=>{
+    const btn=document.createElement('button');
+    btn.className='editor-cons-btn'+(c===editorCons?' sel':'');
+    btn.style.cssText=c===editorCons?`background:${CCOLORS[c]};color:#fff`:'';
+    btn.textContent=c;
+    btn.onclick=()=>{
+      editorCons=c;
+      document.querySelectorAll('.editor-cons-btn').forEach(b=>{
+        b.classList.remove('sel');b.style.cssText='';
+      });
+      btn.classList.add('sel');
+      btn.style.cssText=`background:${CCOLORS[c]};color:#fff`;
+      renderEditorContent();
+    };
+    sel.appendChild(btn);
+  });
+
+  renderEditorContent();
+  document.getElementById('editor-panel').classList.add('active');
+}
+
+function closeEditor(){ document.getElementById('editor-panel').classList.remove('active'); }
+
+function renderEditorContent(){
+  const container=document.getElementById('editor-content');
+  container.innerHTML='';
+  const c=editorCons;
+  const color=CCOLORS[c];
+
+  VOWELS.forEach(v=>{
+    const syl=c+v;
+    const baseWords=BASE_DATA[c][v]||[];
+    const extraWords=editorDraft[c][v]||[];
+
+    const section=document.createElement('div');
+    section.className='editor-syl-section';
+    section.innerHTML=`
+      <div class="editor-syl-title">
+        <span class="editor-syl-badge" style="background:${color}">${syl}</span>
+        Palabras
+      </div>
+    `;
+
+    // base words (read-only display)
+    baseWords.forEach(w=>{
+      const row=document.createElement('div');
+      row.className='word-row';
+      row.style.opacity='.6';
+      row.innerHTML=`
+        <input value="${w.p}" disabled style="background:#f9f9f9">
+        <input value="${w.i}" disabled class="img-input" style="background:#f9f9f9;width:130px;flex:none">
+        <div style="width:36px;text-align:center;color:#ccc;font-size:.8rem">🔒</div>
+      `;
+      section.appendChild(row);
+    });
+
+    // extra words (editable)
+    extraWords.forEach((w,idx)=>{
+      section.appendChild(makeExtraRow(c,v,w,idx));
+    });
+
+    // add button
+    const addBtn=document.createElement('button');
+    addBtn.className='add-word-btn';
+    addBtn.textContent='+ Añadir palabra';
+    addBtn.onclick=()=>{
+      editorDraft[c][v].push({p:'',i:''});
+      renderEditorContent();
+      // scroll to bottom of section
+      setTimeout(()=>addBtn.scrollIntoView({behavior:'smooth'}),100);
+    };
+    section.appendChild(addBtn);
+    container.appendChild(section);
+  });
+}
+
+function makeExtraRow(c,v,w,idx){
+  const row=document.createElement('div');
+  row.className='word-row';
+  row.innerHTML=`
+    <input type="text" value="${w.p}" placeholder="Palabra" style="flex:1">
+    <input type="text" value="${w.i}" placeholder="imagen.png" class="img-input" style="width:130px;flex:none">
+    <button class="word-row-del">🗑️</button>
+  `;
+  const [pInput,iInput]=row.querySelectorAll('input');
+  pInput.oninput=()=>{ editorDraft[c][v][idx].p=pInput.value; };
+  iInput.oninput=()=>{ editorDraft[c][v][idx].i=iInput.value; };
+  row.querySelector('.word-row-del').onclick=()=>{
+    editorDraft[c][v].splice(idx,1);
+    renderEditorContent();
+  };
+  return row;
+}
+
+function saveEdits(){
+  // clean empty entries
+  CONSONANTS.forEach(c=>{
+    VOWELS.forEach(v=>{
+      editorDraft[c][v]=editorDraft[c][v].filter(w=>w.p.trim()&&w.i.trim());
+    });
+  });
+  saveExtra(editorDraft);
+  closeEditor();
+  toast('💾 ¡Guardado!');
+}
+
+/* ════ TOAST ════ */
+let toastT;
+function toast(msg,ok=true){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className=ok?'show':'show bad';
+  clearTimeout(toastT);toastT=setTimeout(()=>t.className='',2000);
+}
+
+/* ════ INIT ════ */
+buildMenu();
+</script>
+</body>
+</html>

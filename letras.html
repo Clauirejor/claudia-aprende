@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🔤 Letras</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap');
+
+:root{ --bg:#FFF8EE; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;overflow-x:hidden;}
+
+/* ── HEADER ── */
+#app-header{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 20px;background:#fff;
+  box-shadow:0 3px 12px rgba(0,0,0,.1);
+  position:sticky;top:0;z-index:200;
+}
+#back-btn{
+  display:none;width:52px;height:52px;border-radius:50%;border:none;
+  background:#FF6B6B;color:#fff;font-size:1.6rem;cursor:pointer;
+  box-shadow:0 4px 10px rgba(255,107,107,.4);flex-shrink:0;
+  align-items:center;justify-content:center;transition:transform .15s;
+}
+#back-btn:active{transform:scale(.92);}
+#app-title{font-family:'Fredoka One',cursive;font-size:1.6rem;color:#444;flex:1;}
+
+/* ── LETTER MENU ── */
+#menu{padding:20px 16px 32px;max-width:800px;margin:0 auto;}
+#menu h2{
+  font-family:'Fredoka One',cursive;font-size:1.2rem;
+  color:#888;margin-bottom:16px;text-align:center;
+}
+
+/* level selector on menu */
+.level-tabs{
+  display:flex;gap:10px;justify-content:center;margin-bottom:20px;flex-wrap:wrap;
+}
+.level-tab{
+  font-family:'Fredoka One',cursive;font-size:1rem;
+  padding:10px 22px;border:none;border-radius:50px;
+  cursor:pointer;background:#eee;color:#666;
+  box-shadow:0 3px 0 rgba(0,0,0,.12);transition:all .15s;
+}
+.level-tab.active{color:#fff;transform:scale(1.06);}
+.level-tab:active{transform:translateY(2px);}
+
+.letter-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(68px,1fr));
+  gap:10px;
+}
+.letter-btn{
+  aspect-ratio:1/1;border-radius:18px;border:none;cursor:pointer;
+  font-family:'Fredoka One',cursive;font-size:2rem;color:#fff;
+  box-shadow:0 5px 0 rgba(0,0,0,.18),0 8px 18px rgba(0,0,0,.1);
+  transition:transform .12s,box-shadow .12s;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.letter-btn:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.18);}
+/* small level badge on each card */
+.letter-btn .lvl-dot{
+  position:absolute;bottom:6px;right:8px;
+  font-size:.55rem;opacity:.8;letter-spacing:1px;
+}
+
+/* ── TRACE SCREEN ── */
+#trace-screen{
+  display:none;padding:16px 16px 32px;
+  max-width:800px;margin:0 auto;
+}
+#trace-screen.active{display:block;}
+
+/* letter nav bar */
+.trace-nav{
+  display:flex;align-items:center;justify-content:center;gap:14px;
+  margin-bottom:14px;
+}
+.nav-btn{
+  width:54px;height:54px;border-radius:50%;border:none;
+  font-family:'Fredoka One',cursive;font-size:1.7rem;
+  background:#fff;color:#555;cursor:pointer;
+  box-shadow:0 4px 0 rgba(0,0,0,.13);transition:all .13s;
+  display:flex;align-items:center;justify-content:center;
+}
+.nav-btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.13);}
+#trace-badge{
+  font-family:'Fredoka One',cursive;font-size:2.4rem;color:#fff;
+  width:72px;height:72px;border-radius:20px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 5px 16px rgba(0,0,0,.2);transition:background .3s;
+}
+
+/* level pills inside trace screen */
+.trace-levels{
+  display:flex;gap:8px;justify-content:center;margin-bottom:12px;flex-wrap:wrap;
+}
+.trace-level-btn{
+  font-family:'Fredoka One',cursive;font-size:.9rem;
+  padding:8px 18px;border:none;border-radius:50px;
+  cursor:pointer;background:#eee;color:#666;
+  box-shadow:0 3px 0 rgba(0,0,0,.1);transition:all .13s;
+}
+.trace-level-btn.active{color:#fff;}
+.trace-level-btn:active{transform:translateY(2px);}
+
+/* tools row */
+.trace-tools{
+  display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:10px;
+}
+.tool-btn{
+  font-family:'Fredoka One',cursive;font-size:.88rem;
+  padding:8px 16px;border:none;border-radius:50px;color:#fff;
+  cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.18);transition:all .13s;
+}
+.tool-btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.18);}
+#btn-clear{background:#FF6B6B;}
+#btn-color{background:#4D96FF;}
+
+/* color picker */
+.color-row{
+  display:none;flex-wrap:wrap;gap:8px;justify-content:center;
+  margin-bottom:10px;background:#fff;border-radius:20px;padding:12px;
+  box-shadow:0 2px 12px rgba(0,0,0,.08);
+}
+.color-row.visible{display:flex;}
+.color-dot{
+  width:34px;height:34px;border-radius:50%;border:3px solid transparent;
+  cursor:pointer;transition:transform .13s,border-color .13s;
+  box-shadow:0 2px 6px rgba(0,0,0,.2);
+}
+.color-dot.sel{border-color:#333;transform:scale(1.18);}
+
+/* canvas wrapper — fills screen */
+.canvas-wrapper{
+  position:relative;background:#fff;border-radius:24px;
+  overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.1);
+  border:3px solid #eee;touch-action:none;
+}
+#trace-canvas{display:block;width:100%;touch-action:none;}
+
+/* ghost letter guide */
+#trace-guide{
+  position:absolute;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fredoka One',cursive;
+  font-size:min(58vw,440px);
+  line-height:1;user-select:none;
+  transition:color .3s, opacity .3s;
+  color:rgba(0,0,0,.07);
+}
+
+/* ── LEVEL 2: dotted path overlay ── */
+#dot-overlay{
+  position:absolute;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;
+  opacity:0;transition:opacity .3s;
+}
+#dot-overlay.visible{opacity:1;}
+
+/* feedback */
+.trace-feedback{
+  text-align:center;margin-top:12px;
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(1rem,3.5vw,1.4rem);
+  color:#888;min-height:28px;
+}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(120px);
+  font-family:'Fredoka One',cursive;font-size:1.4rem;
+  padding:12px 32px;border-radius:50px;background:#6BCB77;color:#fff;
+  box-shadow:0 8px 24px rgba(0,0,0,.2);
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+  z-index:999;pointer-events:none;white-space:nowrap;
+}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.bad{background:#FF6B6B;}
+
+/* ── COLORS PER LETTER (cycling 9 colors) ── */
+</style>
+</head>
+<body>
+
+<div id="app-header">
+  <button id="back-btn" onclick="goMenu()">◀</button>
+  <div id="app-title">🔤 Letras</div>
+</div>
+
+<!-- ══ MENU ══ -->
+<div id="menu">
+  <div class="level-tabs">
+    <button class="level-tab active" data-level="1"
+      style="background:linear-gradient(135deg,#6BCB77,#20C997)"
+      onclick="selectLevel(1,this)">1 · Con modelo</button>
+    <button class="level-tab" data-level="2"
+      style="background:#eee"
+      onclick="selectLevel(2,this)">2 · Puntos</button>
+    <button class="level-tab" data-level="3"
+      style="background:#eee"
+      onclick="selectLevel(3,this)">3 · Libre</button>
+  </div>
+  <h2>Elige una letra</h2>
+  <div class="letter-grid" id="letter-grid"></div>
+</div>
+
+<!-- ══ TRACE SCREEN ══ -->
+<div id="trace-screen">
+  <div class="trace-nav">
+    <button class="nav-btn" onclick="traceNav(-1)">◀</button>
+    <div id="trace-badge">A</div>
+    <button class="nav-btn" onclick="traceNav(1)">▶</button>
+  </div>
+
+  <div class="trace-levels">
+    <button class="trace-level-btn active" data-lv="1" onclick="setLevel(1,this)">1 · Con modelo</button>
+    <button class="trace-level-btn" data-lv="2" onclick="setLevel(2,this)">2 · Puntos</button>
+    <button class="trace-level-btn" data-lv="3" onclick="setLevel(3,this)">3 · Libre</button>
+  </div>
+
+  <div class="trace-tools">
+    <button class="tool-btn" id="btn-color" onclick="toggleColors()">🎨 Color</button>
+    <button class="tool-btn" id="btn-clear" onclick="clearCanvas()">🗑️ Borrar</button>
+  </div>
+
+  <div class="color-row" id="color-row"></div>
+
+  <div class="canvas-wrapper" id="canvas-wrapper">
+    <canvas id="trace-canvas"></canvas>
+    <div id="trace-guide">A</div>
+    <canvas id="dot-overlay" class="dot-overlay"></canvas>
+  </div>
+
+  <div class="trace-feedback" id="trace-feedback">✏️ Repasa la letra con el lápiz</div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ════ CONSTANTS ════ */
+const LETTERS = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ'.split('');
+
+const LCOLORS = [
+  '#FF6B6B','#FF922B','#FFCA3A','#6BCB77','#20C997',
+  '#4D96FF','#CC5DE8','#F06595','#74C0FC','#FF6B6B',
+  '#FF922B','#FFCA3A','#6BCB77','#20C997','#4D96FF',
+  '#CC5DE8','#F06595','#74C0FC','#FF6B6B','#FF922B',
+  '#FFCA3A','#6BCB77','#20C997','#4D96FF','#CC5DE8',
+  '#F06595','#74C0FC'
+];
+
+const DRAW_COLORS = [
+  '#4D96FF','#FF6B6B','#6BCB77','#FF922B',
+  '#CC5DE8','#F06595','#20C997','#FFD43B','#333333'
+];
+
+const FEEDBACK = [
+  '✏️ Repasa la letra con el lápiz',
+  '👍 ¡Sigue trazando!',
+  '🌟 ¡Qué bien trazas!',
+  '💪 ¡Casi lo tienes!',
+  '✅ ¡Qué bonita letra!',
+  '🎉 ¡Eres una artista!'
+];
+
+/* ════ STATE ════ */
+let currentLetterIdx = 0;
+let currentLevel = 1;      // 1=model, 2=dots, 3=free
+let menuLevel = 1;
+let drawColor = '#4D96FF';
+let colorRowOn = false;
+let isDrawing = false;
+let strokeCount = 0;
+let canvasReady = false;
+
+/* ════ AUDIO ════ */
+const AC = new(window.AudioContext||window.webkitAudioContext)();
+function playTone(f=440,dur=0.35){
+  AC.resume();
+  const o=AC.createOscillator(),g=AC.createGain();
+  o.connect(g);g.connect(AC.destination);
+  o.type='sine';o.frequency.value=f;
+  g.gain.setValueAtTime(.35,AC.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+dur);
+  o.start();o.stop(AC.currentTime+dur);
+}
+function speakLetter(l){
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(l);
+  u.lang='es-ES';u.rate=0.7;u.pitch=1.2;
+  speechSynthesis.speak(u);
+}
+
+/* ════ MENU ════ */
+function buildMenu(){
+  const grid=document.getElementById('letter-grid');
+  grid.innerHTML='';
+  LETTERS.forEach((l,i)=>{
+    const btn=document.createElement('button');
+    btn.className='letter-btn';
+    btn.style.background=`linear-gradient(135deg,${LCOLORS[i]},${LCOLORS[i]}bb)`;
+    btn.innerHTML=`${l}<span class="lvl-dot">${'⬤'.repeat(menuLevel)}</span>`;
+    btn.onclick=()=>openLetter(i);
+    grid.appendChild(btn);
+  });
+}
+
+function selectLevel(lv, btn){
+  menuLevel=lv;
+  document.querySelectorAll('.level-tab').forEach(b=>{
+    b.classList.remove('active');
+    b.style.background='#eee';b.style.color='#666';
+  });
+  btn.classList.add('active');
+  const colors=['','linear-gradient(135deg,#6BCB77,#20C997)',
+                   'linear-gradient(135deg,#4D96FF,#74C0FC)',
+                   'linear-gradient(135deg,#CC5DE8,#F06595)'];
+  btn.style.background=colors[lv];btn.style.color='#fff';
+  buildMenu();
+}
+
+/* ════ OPEN LETTER ════ */
+function openLetter(idx){
+  currentLetterIdx=idx;
+  currentLevel=menuLevel;
+  strokeCount=0;
+  document.getElementById('menu').style.display='none';
+  document.getElementById('trace-screen').classList.add('active');
+  document.getElementById('back-btn').style.display='flex';
+  if(!canvasReady){ initCanvas(); canvasReady=true; }
+  updateLetter();
+  syncLevelBtns();
+}
+
+function goMenu(){
+  document.getElementById('menu').style.display='block';
+  document.getElementById('trace-screen').classList.remove('active');
+  document.getElementById('back-btn').style.display='none';
+  buildMenu();
+}
+
+function traceNav(dir){
+  currentLetterIdx=(currentLetterIdx+dir+LETTERS.length)%LETTERS.length;
+  strokeCount=0;
+  updateLetter();
+}
+
+function updateLetter(){
+  const l=LETTERS[currentLetterIdx];
+  const col=LCOLORS[currentLetterIdx];
+
+  const badge=document.getElementById('trace-badge');
+  badge.textContent=l;badge.style.background=col;
+
+  document.getElementById('trace-guide').textContent=l;
+  applyLevel();
+  clearCanvas();
+  speakLetter(l);
+  playTone(280+currentLetterIdx*15, 0.35);
+  document.getElementById('trace-feedback').textContent=FEEDBACK[0];
+}
+
+/* ════ LEVELS ════ */
+function setLevel(lv, btn){
+  currentLevel=lv;
+  syncLevelBtns();
+  applyLevel();
+  clearCanvas();
+}
+
+function syncLevelBtns(){
+  const col=LCOLORS[currentLetterIdx];
+  document.querySelectorAll('.trace-level-btn').forEach(b=>{
+    const lv=+b.dataset.lv;
+    b.classList.toggle('active',lv===currentLevel);
+    b.style.background=lv===currentLevel?col:'#eee';
+    b.style.color=lv===currentLevel?'#fff':'#666';
+  });
+}
+
+function applyLevel(){
+  const guide=document.getElementById('trace-guide');
+  const dotCanvas=document.getElementById('dot-overlay');
+
+  if(currentLevel===1){
+    // strong ghost model
+    guide.style.color='rgba(0,0,0,.10)';
+    guide.style.opacity='1';
+    dotCanvas.classList.remove('visible');
+    drawDots(false);
+  } else if(currentLevel===2){
+    // lighter ghost + dotted path
+    guide.style.color='rgba(0,0,0,.05)';
+    guide.style.opacity='1';
+    dotCanvas.classList.add('visible');
+    drawDots(true);
+  } else {
+    // blank
+    guide.style.opacity='0';
+    dotCanvas.classList.remove('visible');
+    drawDots(false);
+  }
+}
+
+/* ════ DOTTED PATH (Level 2) ════ */
+/*
+  Each letter has a set of key waypoints (as % of canvas W/H).
+  We draw animated dashed circles along those paths.
+*/
+const LETTER_PATHS = {
+  A:[[50,10],[20,90],[80,90],[35,60],[65,60]],
+  B:[[20,10],[20,90],[20,10],[60,10],[75,25],[60,45],[20,45],[60,45],[75,65],[60,90],[20,90]],
+  C:[[80,20],[50,10],[20,30],[20,70],[50,90],[80,80]],
+  D:[[20,10],[20,90],[20,10],[55,10],[80,30],[80,70],[55,90],[20,90]],
+  E:[[80,10],[20,10],[20,50],[65,50],[20,50],[20,90],[80,90]],
+  F:[[80,10],[20,10],[20,90],[20,50],[65,50]],
+  G:[[80,20],[50,10],[20,30],[20,70],[50,90],[80,70],[80,50],[55,50]],
+  H:[[20,10],[20,90],[20,50],[80,50],[80,10],[80,90]],
+  I:[[30,10],[70,10],[50,10],[50,90],[30,90],[70,90]],
+  J:[[30,10],[70,10],[70,70],[60,90],[40,90],[25,75]],
+  K:[[20,10],[20,90],[20,50],[75,10],[20,50],[75,90]],
+  L:[[20,10],[20,90],[75,90]],
+  M:[[20,90],[20,10],[50,55],[80,10],[80,90]],
+  N:[[20,90],[20,10],[80,90],[80,10]],
+  Ñ:[[20,90],[20,10],[80,90],[80,10],[35,5],[50,0],[65,5]],
+  O:[[50,10],[20,30],[20,70],[50,90],[80,70],[80,30],[50,10]],
+  P:[[20,90],[20,10],[60,10],[80,25],[60,50],[20,50]],
+  Q:[[50,10],[20,30],[20,70],[50,90],[80,70],[80,30],[50,10],[65,75],[85,95]],
+  R:[[20,90],[20,10],[60,10],[80,25],[60,50],[20,50],[65,90]],
+  S:[[80,20],[50,10],[20,20],[20,45],[50,50],[80,65],[80,80],[50,90],[20,80]],
+  T:[[20,10],[80,10],[50,10],[50,90]],
+  U:[[20,10],[20,75],[35,90],[65,90],[80,75],[80,10]],
+  V:[[20,10],[50,90],[80,10]],
+  W:[[15,10],[30,90],[50,50],[70,90],[85,10]],
+  X:[[20,10],[80,90],[50,50],[20,90],[80,10]],
+  Y:[[20,10],[50,50],[80,10],[50,50],[50,90]],
+  Z:[[20,10],[80,10],[20,90],[80,90]]
+};
+
+function drawDots(visible){
+  const dotCanvas=document.getElementById('dot-overlay');
+  const dc=dotCanvas.getContext('2d');
+  const W=dotCanvas.width, H=dotCanvas.height;
+  dc.clearRect(0,0,W,H);
+  if(!visible) return;
+
+  const l=LETTERS[currentLetterIdx];
+  const path=LETTER_PATHS[l]||[];
+  const col=LCOLORS[currentLetterIdx];
+
+  if(path.length<2) return;
+
+  // interpolate dots along the path segments
+  const dots=[];
+  for(let i=0;i<path.length-1;i++){
+    const [x1p,y1p]=path[i];
+    const [x2p,y2p]=path[i+1];
+    const x1=x1p/100*W, y1=y1p/100*H;
+    const x2=x2p/100*W, y2=y2p/100*H;
+    const dist=Math.hypot(x2-x1,y2-y1);
+    const steps=Math.max(3,Math.floor(dist/28));
+    for(let s=0;s<=steps;s++){
+      const t=s/steps;
+      dots.push([x1+(x2-x1)*t, y1+(y2-y1)*t]);
+    }
+  }
+
+  // draw dots
+  dots.forEach(([x,y],idx)=>{
+    const r=idx===0?12:8;
+    dc.beginPath();
+    dc.arc(x,y,r,0,Math.PI*2);
+    dc.fillStyle=idx===0?col:col+'99';
+    dc.fill();
+    // order number on start dot
+    if(idx===0){
+      dc.fillStyle='#fff';
+      dc.font=`bold ${r*1.2}px Fredoka One`;
+      dc.textAlign='center';dc.textBaseline='middle';
+      dc.fillText('1',x,y);
+    }
+  });
+
+  // draw arrows between segment starts
+  for(let i=0;i<path.length-1;i++){
+    const [x1p,y1p]=path[i];
+    const [x2p,y2p]=path[i+1];
+    const x1=x1p/100*W+16, y1=y1p/100*H;
+    const x2=x2p/100*W, y2=y2p/100*H;
+    const angle=Math.atan2(y2-y1,x2-x1);
+    const mx=(x1+x2)/2, my=(y1+y2)/2;
+    drawArrow(dc,mx,my,angle,col);
+  }
+}
+
+function drawArrow(dc,x,y,angle,col){
+  dc.save();
+  dc.translate(x,y);dc.rotate(angle);
+  dc.fillStyle=col+'cc';
+  dc.beginPath();
+  dc.moveTo(10,0);dc.lineTo(-6,-6);dc.lineTo(-6,6);
+  dc.closePath();dc.fill();
+  dc.restore();
+}
+
+/* ════ CANVAS INIT ════ */
+let traceCtx=null;
+let traceCanvas=null;
+
+function initCanvas(){
+  traceCanvas=document.getElementById('trace-canvas');
+  traceCtx=traceCanvas.getContext('2d');
+  buildColorPicker();
+  sizeCanvas();
+  attachEvents();
+}
+
+function sizeCanvas(){
+  const wrapper=document.getElementById('canvas-wrapper');
+  const W=wrapper.clientWidth;
+  // square-ish: 75% of viewport height minus header/nav
+  const H=Math.min(Math.round(W*0.85), window.innerHeight-280);
+
+  // main draw canvas
+  traceCanvas.width=W; traceCanvas.height=H;
+  traceCanvas.style.height=H+'px';
+
+  // dot overlay canvas — same size
+  const dotC=document.getElementById('dot-overlay');
+  dotC.width=W; dotC.height=H;
+  dotC.style.cssText=`position:absolute;top:0;left:0;width:100%;height:${H}px;pointer-events:none;`;
+
+  if(currentLevel===2) drawDots(true);
+}
+
+function buildColorPicker(){
+  const row=document.getElementById('color-row');row.innerHTML='';
+  DRAW_COLORS.forEach(c=>{
+    const d=document.createElement('div');
+    d.className='color-dot'+(c===drawColor?' sel':'');
+    d.style.background=c;
+    d.addEventListener('click',()=>{
+      drawColor=c;
+      document.querySelectorAll('.color-dot').forEach(x=>x.classList.remove('sel'));
+      d.classList.add('sel');
+    });
+    row.appendChild(d);
+  });
+}
+
+function toggleColors(){
+  colorRowOn=!colorRowOn;
+  document.getElementById('color-row').classList.toggle('visible',colorRowOn);
+  document.getElementById('btn-color').style.outline=colorRowOn?'3px solid rgba(0,0,0,.25)':'none';
+}
+
+function clearCanvas(){
+  if(!traceCtx) return;
+  traceCtx.clearRect(0,0,traceCanvas.width,traceCanvas.height);
+  strokeCount=0;
+  document.getElementById('trace-feedback').textContent=FEEDBACK[0];
+  if(currentLevel===2) drawDots(true);
+}
+
+/* ════ DRAWING ════ */
+function getPos(e){
+  const rect=traceCanvas.getBoundingClientRect();
+  const sx=traceCanvas.width/rect.width, sy=traceCanvas.height/rect.height;
+  let cx,cy;
+  if(e.touches&&e.touches.length){ cx=e.touches[0].clientX;cy=e.touches[0].clientY; }
+  else{ cx=e.clientX;cy=e.clientY; }
+  return{x:(cx-rect.left)*sx, y:(cy-rect.top)*sy};
+}
+function getPressure(e){
+  return(e.pointerType==='pen'&&e.pressure>0)?e.pressure:0.5;
+}
+
+function startDraw(e){
+  e.preventDefault();AC.resume();
+  isDrawing=true;
+  const p=getPos(e);
+  traceCtx.beginPath();traceCtx.moveTo(p.x,p.y);
+  applyStrokeStyle(e);
+}
+function applyStrokeStyle(e){
+  const pr=getPressure(e);
+  traceCtx.lineWidth=Math.max(5,pr*38);
+  traceCtx.strokeStyle=drawColor;
+  traceCtx.lineCap='round';traceCtx.lineJoin='round';
+  traceCtx.globalAlpha=Math.min(1,.65+pr*.35);
+}
+function doDraw(e){
+  if(!isDrawing) return;
+  e.preventDefault();
+  const p=getPos(e);
+  applyStrokeStyle(e);
+  traceCtx.lineTo(p.x,p.y);traceCtx.stroke();
+  traceCtx.beginPath();traceCtx.moveTo(p.x,p.y);
+}
+function endDraw(){
+  if(!isDrawing) return;
+  isDrawing=false;traceCtx.globalAlpha=1;
+  strokeCount++;
+  const idx=Math.min(strokeCount,FEEDBACK.length-1);
+  document.getElementById('trace-feedback').textContent=FEEDBACK[idx];
+  if(strokeCount===5) setTimeout(()=>showToast('🌟 ¡Bonita letra!'),200);
+}
+
+function attachEvents(){
+  traceCanvas.addEventListener('pointerdown',startDraw,{passive:false});
+  traceCanvas.addEventListener('pointermove',doDraw,{passive:false});
+  traceCanvas.addEventListener('pointerup',endDraw,{passive:false});
+  traceCanvas.addEventListener('pointerleave',endDraw,{passive:false});
+  traceCanvas.addEventListener('pointercancel',endDraw,{passive:false});
+  traceCanvas.addEventListener('touchstart',startDraw,{passive:false});
+  traceCanvas.addEventListener('touchmove',doDraw,{passive:false});
+  traceCanvas.addEventListener('touchend',endDraw,{passive:false});
+}
+
+window.addEventListener('resize',()=>{
+  if(document.getElementById('trace-screen').classList.contains('active')) sizeCanvas();
+});
+
+/* ════ TOAST ════ */
+let toastT;
+function showToast(msg,ok=true){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className=ok?'show':'show bad';
+  clearTimeout(toastT);toastT=setTimeout(()=>t.className='',2000);
+}
+
+/* ════ INIT ════ */
+buildMenu();
+</script>
+</body>
+</html>

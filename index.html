@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🌟 Claudia Aprende</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap');
+
+:root{ --bg:#FFF8EE; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{
+  font-family:'Nunito',sans-serif;
+  background:var(--bg);
+  min-height:100vh;
+  display:flex;flex-direction:column;
+}
+
+header{
+  padding:28px 20px 20px;
+  text-align:center;
+}
+header h1{
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(2rem,7vw,3.2rem);
+  background:linear-gradient(135deg,#FF6B6B,#FF922B,#FFD93D,#6BCB77,#4D96FF,#CC5DE8);
+  background-size:300% 300%;
+  animation:gradMove 5s ease infinite;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  line-height:1.1;
+}
+@keyframes gradMove{
+  0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}
+}
+header p{
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(1rem,3.5vw,1.4rem);
+  color:#aaa;margin-top:6px;
+}
+
+main{
+  flex:1;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:20px;
+  padding:10px 20px 40px;
+  max-width:900px;
+  margin:0 auto;
+  width:100%;
+  align-content:center;
+}
+
+.mod-card{
+  border-radius:28px;border:none;cursor:pointer;
+  padding:32px 16px 26px;
+  display:flex;flex-direction:column;
+  align-items:center;gap:14px;
+  color:#fff;
+  box-shadow:0 8px 0 rgba(0,0,0,.16),0 14px 30px rgba(0,0,0,.12);
+  transition:transform .15s,box-shadow .15s;
+  text-decoration:none;
+}
+.mod-card:active{transform:translateY(7px);box-shadow:0 1px 0 rgba(0,0,0,.16),0 4px 12px rgba(0,0,0,.1);}
+.mod-card .mod-icon{font-size:clamp(3rem,10vw,5rem);line-height:1;filter:drop-shadow(0 3px 6px rgba(0,0,0,.2));}
+.mod-card .mod-title{font-family:'Fredoka One',cursive;font-size:clamp(1.3rem,4vw,1.8rem);text-align:center;text-shadow:1px 2px 0 rgba(0,0,0,.18);}
+.mod-card .mod-sub{font-family:'Nunito',sans-serif;font-weight:700;font-size:clamp(.8rem,2.5vw,1rem);text-align:center;opacity:.88;line-height:1.3;}
+
+.card-num{background:linear-gradient(145deg,#FF6B6B,#FF922B);}
+.card-let{background:linear-gradient(145deg,#4D96FF,#74C0FC);}
+.card-fon{background:linear-gradient(145deg,#CC5DE8,#F06595);}
+.card-jue{background:linear-gradient(145deg,#6BCB77,#20C997);}
+.card-boc{background:linear-gradient(145deg,#FF922B,#FFD93D);}
+
+footer{text-align:center;padding:16px;font-family:'Fredoka One',cursive;font-size:.9rem;color:#ccc;}
+
+@media(min-width:900px){main{grid-template-columns:repeat(3,1fr);}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌟 Claudia Aprende</h1>
+  <p>¿Qué quieres practicar hoy?</p>
+</header>
+
+<main>
+  <a class="mod-card card-num" href="numeros.html">
+    <span class="mod-icon">🔢</span>
+    <span class="mod-title">Números</span>
+    <span class="mod-sub">Piano · Cuenta · Sumas · Trazado</span>
+  </a>
+  <a class="mod-card card-let" href="letras.html">
+    <span class="mod-icon">🔤</span>
+    <span class="mod-title">Letras</span>
+    <span class="mod-sub">Traza las 27 letras · 3 niveles</span>
+  </a>
+  <a class="mod-card card-fon" href="fonemas.html">
+    <span class="mod-icon">🗣️</span>
+    <span class="mod-title">Fonemas</span>
+    <span class="mod-sub">Sílabas · Imágenes · Audio</span>
+  </a>
+  <a class="mod-card card-jue" href="juegos.html">
+    <span class="mod-icon">🎮</span>
+    <span class="mod-title">Juegos</span>
+    <span class="mod-sub">10 juegos de letras y fonemas</span>
+  </a>
+  <a class="mod-card card-boc" href="boca.html">
+    <span class="mod-icon">👄</span>
+    <span class="mod-title">Boca</span>
+    <span class="mod-sub">20 ejercicios de praxias</span>
+  </a>
+</main>
+
+<footer>Hecho con ❤️ para Claudia</footer>
+
+</body>
+</html>

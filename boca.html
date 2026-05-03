@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>👄 Ejercicios de Boca</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap');
+
+:root{ --bg:#FFF8EE; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;overflow-x:hidden;}
+
+/* ── HEADER ── */
+#app-header{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 20px;background:#fff;
+  box-shadow:0 3px 12px rgba(0,0,0,.1);
+  position:sticky;top:0;z-index:200;
+}
+#back-btn{
+  display:none;width:52px;height:52px;border-radius:50%;border:none;
+  background:#FF6B6B;color:#fff;font-size:1.6rem;cursor:pointer;
+  box-shadow:0 4px 10px rgba(255,107,107,.4);flex-shrink:0;
+  align-items:center;justify-content:center;transition:transform .15s;
+}
+#back-btn:active{transform:scale(.92);}
+#app-title{font-family:'Fredoka One',cursive;font-size:1.6rem;color:#444;flex:1;}
+
+/* ── MENU ── */
+#menu{padding:20px 16px 32px;max-width:800px;margin:0 auto;}
+.cat-section{margin-bottom:28px;}
+.cat-title{
+  font-family:'Fredoka One',cursive;font-size:1.2rem;color:#666;
+  margin-bottom:12px;padding-left:4px;
+  display:flex;align-items:center;gap:8px;
+}
+.exercise-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:12px;
+}
+.ex-btn{
+  border-radius:20px;border:none;cursor:pointer;
+  padding:16px 12px;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  color:#fff;
+  box-shadow:0 5px 0 rgba(0,0,0,.18),0 8px 18px rgba(0,0,0,.1);
+  transition:transform .12s,box-shadow .12s;
+}
+.ex-btn:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.18);}
+.ex-btn .ex-icon{font-size:2.2rem;line-height:1;}
+.ex-btn .ex-label{
+  font-family:'Fredoka One',cursive;font-size:.95rem;
+  text-align:center;text-shadow:1px 1px 0 rgba(0,0,0,.2);
+}
+
+/* ── EXERCISE SCREEN ── */
+#ex-screen{
+  display:none;padding:16px 16px 32px;
+  max-width:700px;margin:0 auto;
+}
+#ex-screen.active{display:block;}
+
+.ex-nav{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;gap:10px;
+}
+.nav-btn{
+  width:52px;height:52px;border-radius:50%;border:none;
+  font-family:'Fredoka One',cursive;font-size:1.7rem;
+  background:#fff;color:#555;cursor:pointer;
+  box-shadow:0 4px 0 rgba(0,0,0,.13);transition:all .13s;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.nav-btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.13);}
+#ex-title{
+  font-family:'Fredoka One',cursive;font-size:1.5rem;
+  color:#444;text-align:center;flex:1;
+}
+
+/* illustration card */
+.illus-card{
+  background:#fff;border-radius:28px;
+  padding:24px 16px 20px;
+  box-shadow:0 6px 28px rgba(0,0,0,.1);
+  text-align:center;
+  margin-bottom:16px;
+}
+#ex-svg-wrap{
+  width:min(280px,70vw);
+  height:min(280px,70vw);
+  margin:0 auto 16px;
+}
+#ex-svg-wrap svg{width:100%;height:100%;}
+#ex-instruction{
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(1.1rem,4vw,1.5rem);
+  color:#555;line-height:1.3;
+  margin-bottom:6px;
+}
+#ex-tip{
+  font-size:.9rem;color:#aaa;font-weight:700;
+  min-height:20px;
+}
+
+/* timer */
+.timer-section{text-align:center;margin-bottom:16px;}
+#timer-ring-wrap{
+  position:relative;width:100px;height:100px;
+  margin:0 auto 10px;
+}
+#timer-ring-wrap svg{width:100%;height:100%;}
+#timer-count{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-family:'Fredoka One',cursive;font-size:2rem;color:#444;
+}
+.timer-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.timer-btn{
+  font-family:'Fredoka One',cursive;font-size:1rem;
+  padding:10px 24px;border:none;border-radius:50px;color:#fff;
+  cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.2);transition:all .13s;
+}
+.timer-btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.2);}
+#btn-start{background:#6BCB77;}
+#btn-reset{background:#FF922B;}
+
+/* duration selector */
+.dur-row{
+  display:flex;gap:8px;justify-content:center;margin-bottom:14px;flex-wrap:wrap;
+}
+.dur-btn{
+  font-family:'Fredoka One',cursive;font-size:.9rem;
+  padding:7px 16px;border:none;border-radius:50px;
+  background:#eee;color:#666;cursor:pointer;
+  box-shadow:0 2px 0 rgba(0,0,0,.1);transition:all .13s;
+}
+.dur-btn.active{background:#FF6B6B;color:#fff;}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(120px);
+  font-family:'Fredoka One',cursive;font-size:1.4rem;
+  padding:12px 32px;border-radius:50px;background:#6BCB77;color:#fff;
+  box-shadow:0 8px 24px rgba(0,0,0,.2);
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+  z-index:999;pointer-events:none;white-space:nowrap;
+}
+#toast.show{transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<div id="app-header">
+  <button id="back-btn" onclick="goMenu()">◀</button>
+  <div id="app-title">👄 Ejercicios de Boca</div>
+</div>
+
+<!-- ══ MENU ══ -->
+<div id="menu" id="menu"></div>
+
+<!-- ══ EXERCISE SCREEN ══ -->
+<div id="ex-screen">
+  <div class="ex-nav">
+    <button class="nav-btn" onclick="exNav(-1)">◀</button>
+    <div id="ex-title">Sonrisa</div>
+    <button class="nav-btn" onclick="exNav(1)">▶</button>
+  </div>
+
+  <div class="illus-card">
+    <div id="ex-svg-wrap"></div>
+    <div id="ex-instruction"></div>
+    <div id="ex-tip"></div>
+  </div>
+
+  <div class="dur-row">
+    <button class="dur-btn active" onclick="setDur(3,this)">3 seg</button>
+    <button class="dur-btn" onclick="setDur(5,this)">5 seg</button>
+    <button class="dur-btn" onclick="setDur(10,this)">10 seg</button>
+  </div>
+
+  <div class="timer-section">
+    <div id="timer-ring-wrap">
+      <svg viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="44" fill="none" stroke="#eee" stroke-width="8"/>
+        <circle id="timer-arc" cx="50" cy="50" r="44" fill="none"
+          stroke="#6BCB77" stroke-width="8"
+          stroke-dasharray="276.5" stroke-dashoffset="0"
+          stroke-linecap="round"
+          transform="rotate(-90 50 50)"/>
+      </svg>
+      <div id="timer-count">3</div>
+    </div>
+    <div class="timer-btns">
+      <button class="timer-btn" id="btn-start" onclick="startTimer()">▶ Empezar</button>
+      <button class="timer-btn" id="btn-reset" onclick="resetTimer()">↺ Reiniciar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ════ EXERCISES DATA ════ */
+const EXERCISES = [
+  /* ── LABIOS ── */
+  {
+    cat:'👄 Labios', color:'#FF6B6B',
+    name:'Sonrisa grande',
+    instruction:'Pon una sonrisa muy grande, como si fuera la más feliz del mundo 😁',
+    tip:'Mantén los labios estirados hacia los lados',
+    svg: smileSVG
+  },{
+    cat:'👄 Labios', color:'#FF6B6B',
+    name:'Morro / Puchero',
+    instruction:'Junta los labios y empújalos hacia fuera, como un besito de pez 🐟',
+    tip:'Lleva los labios lo más adelante que puedas',
+    svg: morrSVG
+  },{
+    cat:'👄 Labios', color:'#FF6B6B',
+    name:'Abre y cierra',
+    instruction:'Abre la boca muy grande y ciérrala despacio, como un cocodrilo 🐊',
+    tip:'Abre todo lo que puedas',
+    svg: openCloseSVG
+  },{
+    cat:'👄 Labios', color:'#FF6B6B',
+    name:'Morder labio',
+    instruction:'Muerde suavemente el labio de abajo con los dientes de arriba 😬',
+    tip:'Muy suave, no duele',
+    svg: biteLipSVG
+  },{
+    cat:'👄 Labios', color:'#FF6B6B',
+    name:'Juntar labios',
+    instruction:'Cierra los labios fuerte y aguanta, como si no quisieras hablar 🤐',
+    tip:'Aprieta los labios sin abrir la boca',
+    svg: pressLipsSVG
+  },
+  /* ── LENGUA ── */
+  {
+    cat:'👅 Lengua', color:'#FF922B',
+    name:'Lengua arriba',
+    instruction:'Saca la lengua y apúntala hacia arriba, toca la nariz si puedes 👆',
+    tip:'Lleva la punta de la lengua hacia arriba',
+    svg: tongueUpSVG
+  },{
+    cat:'👅 Lengua', color:'#FF922B',
+    name:'Lengua abajo',
+    instruction:'Saca la lengua y bájala hacia abajo, toca la barbilla si puedes 👇',
+    tip:'Lleva la punta de la lengua hacia abajo',
+    svg: tongueDownSVG
+  },{
+    cat:'👅 Lengua', color:'#FF922B',
+    name:'Lengua izquierda',
+    instruction:'Saca la lengua y llévala hacia la izquierda ◀',
+    tip:'Mueve solo la lengua, sin mover la cabeza',
+    svg: tongueLSVG
+  },{
+    cat:'👅 Lengua', color:'#FF922B',
+    name:'Lengua derecha',
+    instruction:'Saca la lengua y llévala hacia la derecha ▶',
+    tip:'Mueve solo la lengua, sin mover la cabeza',
+    svg: tongueRSVG
+  },{
+    cat:'👅 Lengua', color:'#FF922B',
+    name:'Círculos con la lengua',
+    instruction:'Mueve la lengua haciendo círculos por dentro de los labios 🔄',
+    tip:'Primero a un lado, luego al otro',
+    svg: tongueCircSVG
+  },{
+    cat:'👅 Lengua', color:'#FF922B',
+    name:'Sacar y meter',
+    instruction:'Saca la lengua y métela, saca y mete, rápido rápido 🐍',
+    tip:'Como una serpiente',
+    svg: tongueInOutSVG
+  },{
+    cat:'👅 Lengua', color:'#FF922B',
+    name:'Lengua en el paladar',
+    instruction:'Pon la punta de la lengua detrás de los dientes de arriba y aguanta',
+    tip:'Toca el paladar con la lengua',
+    svg: tonguePaladarSVG
+  },
+  /* ── MEJILLAS ── */
+  {
+    cat:'🐡 Mejillas', color:'#6BCB77',
+    name:'Inflar mejillas',
+    instruction:'Infla las dos mejillas con aire, como un globo 🎈',
+    tip:'Cierra los labios y sopla hacia dentro',
+    svg: puffBothSVG
+  },{
+    cat:'🐡 Mejillas', color:'#6BCB77',
+    name:'Inflar una mejilla',
+    instruction:'Infla solo una mejilla, luego la otra, como una pelota rodando ⚽',
+    tip:'El aire va de un lado al otro',
+    svg: puffOneSVG
+  },{
+    cat:'🐡 Mejillas', color:'#6BCB77',
+    name:'Succionar mejillas',
+    instruction:'Mete las mejillas hacia dentro, como si chupases un limón 🍋',
+    tip:'Aprieta las mejillas con los dientes',
+    svg: suckSVG
+  },
+  /* ── SOPLO ── */
+  {
+    cat:'💨 Soplo', color:'#4D96FF',
+    name:'Soplo fuerte',
+    instruction:'Coge aire y sopla muy fuerte, como si quisieras tumbar una casa 🏠💨',
+    tip:'Llena los pulmones y sopla con fuerza',
+    svg: blowHardSVG
+  },{
+    cat:'💨 Soplo', color:'#4D96FF',
+    name:'Soplo suave',
+    instruction:'Sopla muy suavito, como si no quisieras mover una pluma 🪶',
+    tip:'Solo un poquito de aire',
+    svg: blowSoftSVG
+  },{
+    cat:'💨 Soplo', color:'#4D96FF',
+    name:'Apagar vela',
+    instruction:'Imagina que tienes una vela delante y apágala de un soplo 🕯️',
+    tip:'Labios en morro y sopla concentrado',
+    svg: candleSVG
+  },
+  /* ── MANDÍBULA ── */
+  {
+    cat:'🦷 Mandíbula', color:'#CC5DE8',
+    name:'Abrir grande',
+    instruction:'Abre la boca lo más grande que puedas, como un bostezo 🥱',
+    tip:'Baja la mandíbula todo lo que puedas',
+    svg: wideOpenSVG
+  },{
+    cat:'🦷 Mandíbula', color:'#CC5DE8',
+    name:'Mover lateral',
+    instruction:'Mueve la mandíbula de izquierda a derecha, como masticando chicle 🫧',
+    tip:'Despacio y exagerando el movimiento',
+    svg: jawLateralSVG
+  },{
+    cat:'🦷 Mandíbula', color:'#CC5DE8',
+    name:'Masticar exagerado',
+    instruction:'Mastica sin nada en la boca, muy exagerado, que se vea mucho 😋',
+    tip:'Mueve toda la mandíbula bien grande',
+    svg: chewSVG
+  }
+];
+
+/* ════ SVG ILLUSTRATIONS ════
+   Each function returns an SVG string. Faces are simple, clear, child-friendly.
+   Animated with CSS keyframes embedded in the SVG.
+*/
+
+function faceSVG(mouthPath, extras='', animStyle=''){
+  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    ${animStyle}
+    .face{fill:#FFD93D;stroke:#FF922B;stroke-width:3;}
+    .eye{fill:#333;}
+    .mouth{fill:none;stroke:#FF6B6B;stroke-width:4;stroke-linecap:round;}
+    .tongue{fill:#FF6B6B;}
+    .teeth{fill:#fff;stroke:#ddd;stroke-width:1;}
+    .cheek{fill:#FFB3B3;opacity:.5;}
+    .breath{fill:#a8d8ff;opacity:.7;}
+  </style>
+  <!-- face -->
+  <circle class="face" cx="100" cy="100" r="82"/>
+  <!-- cheeks blush -->
+  <ellipse class="cheek" cx="55" cy="125" rx="22" ry="14"/>
+  <ellipse class="cheek" cx="145" cy="125" rx="22" ry="14"/>
+  <!-- eyes -->
+  <ellipse class="eye" cx="72" cy="80" rx="10" ry="11"/>
+  <ellipse class="eye" cx="128" cy="80" rx="10" ry="11"/>
+  <ellipse fill="#fff" cx="76" cy="76" rx="3" ry="3"/>
+  <ellipse fill="#fff" cx="132" cy="76" rx="3" ry="3"/>
+  ${extras}
+  <!-- mouth -->
+  ${mouthPath}
+</svg>`;
+}
+
+function smileSVG(){
+  return faceSVG(
+    `<path class="mouth" d="M68,130 Q100,162 132,130" stroke-width="5"/>`,
+    '',
+    `@keyframes smile{ 0%,100%{transform:scaleX(1)} 50%{transform:scaleX(1.08)} }
+     .mouth{animation:smile 1.5s ease-in-out infinite; transform-origin:100px 140px;}`
+  );
+}
+function morrSVG(){
+  return faceSVG(
+    `<ellipse class="mouth" cx="100" cy="138" rx="18" ry="14" fill="#FF6B6B" stroke="none"/>
+     <ellipse fill="#cc4444" cx="100" cy="138" rx="12" ry="9"/>`,
+    '',
+    `@keyframes morr{ 0%,100%{transform:translateX(0)} 50%{transform:translateX(-3px) scale(1.1)} }
+     .mouth{animation:morr 1.2s ease-in-out infinite; transform-origin:100px 138px;}`
+  );
+}
+function openCloseSVG(){
+  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .face{fill:#FFD93D;stroke:#FF922B;stroke-width:3;}
+    .eye{fill:#333;}
+    .cheek{fill:#FFB3B3;opacity:.5;}
+    .jaw{fill:#FFD93D;stroke:#FF922B;stroke-width:3;}
+    @keyframes jawOpen{
+      0%,40%{transform:translateY(0)}
+      20%{transform:translateY(22px)}
+    }
+    .jaw{animation:jawOpen 2s ease-in-out infinite;transform-origin:100px 140px;}
+    .teeth-top{fill:#fff;stroke:#ddd;stroke-width:1;}
+    .teeth-bot{fill:#fff;stroke:#ddd;stroke-width:1;animation:jawOpen 2s ease-in-out infinite;transform-origin:100px 140px;}
+  </style>
+  <circle class="face" cx="100" cy="95" r="82"/>
+  <ellipse class="cheek" cx="55" cy="110" rx="22" ry="14"/>
+  <ellipse class="cheek" cx="145" cy="110" rx="22" ry="14"/>
+  <ellipse class="eye" cx="72" cy="70" rx="10" ry="11"/>
+  <ellipse class="eye" cx="128" cy="70" rx="10" ry="11"/>
+  <ellipse fill="#fff" cx="76" cy="66" rx="3" ry="3"/>
+  <ellipse fill="#fff" cx="132" cy="66" rx="3" ry="3"/>
+  <rect class="teeth-top" x="72" y="118" width="56" height="10" rx="4"/>
+  <g class="jaw">
+    <rect class="teeth-bot" x="72" y="130" width="56" height="10" rx="4"/>
+    <path fill="#FFD93D" stroke="#FF922B" stroke-width="3" d="M68,135 Q100,165 132,135 L132,155 Q100,175 68,155 Z"/>
+    <ellipse fill="#FF6B6B" cx="100" cy="148" rx="20" ry="12"/>
+  </g>
+</svg>`;
+}
+function biteLipSVG(){
+  return faceSVG(
+    `<path class="mouth" d="M72,128 Q100,138 128,128" stroke-width="4"/>
+     <rect class="teeth" x="78" y="128" width="44" height="9" rx="3"/>
+     <path fill="#FF9999" d="M78,137 Q100,148 122,137 L128,128 Q100,133 72,128 Z"/>`,
+    '',
+    `@keyframes bite{0%,100%{transform:scaleY(1)}50%{transform:scaleY(0.85)}}
+     .mouth{animation:bite 1.8s ease-in-out infinite;transform-origin:100px 135px;}`
+  );
+}
+function pressLipsSVG(){
+  return faceSVG(
+    `<path class="mouth" d="M72,132 Q100,128 128,132" stroke-width="6" stroke="#cc4444"/>`,
+    '',
+    `@keyframes press{0%,100%{stroke-width:6}50%{stroke-width:10}}
+     .mouth{animation:press 1.5s ease-in-out infinite;}`
+  );
+}
+
+/* tongue exercises */
+function tongueBase(tongueEl, animStyle=''){
+  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .face{fill:#FFD93D;stroke:#FF922B;stroke-width:3;}
+    .eye{fill:#333;} .cheek{fill:#FFB3B3;opacity:.5;}
+    ${animStyle}
+  </style>
+  <circle class="face" cx="100" cy="100" r="82"/>
+  <ellipse class="cheek" cx="55" cy="125" rx="22" ry="14"/>
+  <ellipse class="cheek" cx="145" cy="125" rx="22" ry="14"/>
+  <ellipse class="eye" cx="72" cy="80" rx="10" ry="11"/>
+  <ellipse class="eye" cx="128" cy="80" rx="10" ry="11"/>
+  <ellipse fill="#fff" cx="76" cy="76" rx="3" ry="3"/>
+  <ellipse fill="#fff" cx="132" cy="76" rx="3" ry="3"/>
+  <path fill="none" stroke="#FF6B6B" stroke-width="4" stroke-linecap="round" d="M72,130 Q100,150 128,130"/>
+  <rect fill="#fff" x="76" y="128" width="48" height="8" rx="3"/>
+  ${tongueEl}
+</svg>`;
+}
+function tongueUpSVG(){
+  return tongueBase(
+    `<g class="tongue-anim">
+      <ellipse fill="#FF6B6B" cx="100" cy="105" rx="14" ry="20"/>
+      <ellipse fill="#FF4488" cx="100" cy="92" rx="10" ry="8"/>
+    </g>`,
+    `@keyframes tup{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+     .tongue-anim{animation:tup 1.5s ease-in-out infinite;transform-origin:100px 110px;}`
+  );
+}
+function tongueDownSVG(){
+  return tongueBase(
+    `<g class="tongue-anim">
+      <ellipse fill="#FF6B6B" cx="100" cy="155" rx="14" ry="20"/>
+      <ellipse fill="#FF4488" cx="100" cy="168" rx="10" ry="8"/>
+    </g>`,
+    `@keyframes tdown{0%,100%{transform:translateY(0)}50%{transform:translateY(14px)}}
+     .tongue-anim{animation:tdown 1.5s ease-in-out infinite;transform-origin:100px 155px;}`
+  );
+}
+function tongueLSVG(){
+  return tongueBase(
+    `<g class="tongue-anim">
+      <ellipse fill="#FF6B6B" cx="72" cy="140" rx="20" ry="12"/>
+      <ellipse fill="#FF4488" cx="57" cy="140" rx="10" ry="8"/>
+    </g>`,
+    `@keyframes tleft{0%,100%{transform:translateX(0)}50%{transform:translateX(-16px)}}
+     .tongue-anim{animation:tleft 1.4s ease-in-out infinite;transform-origin:72px 140px;}`
+  );
+}
+function tongueRSVG(){
+  return tongueBase(
+    `<g class="tongue-anim">
+      <ellipse fill="#FF6B6B" cx="128" cy="140" rx="20" ry="12"/>
+      <ellipse fill="#FF4488" cx="143" cy="140" rx="10" ry="8"/>
+    </g>`,
+    `@keyframes tright{0%,100%{transform:translateX(0)}50%{transform:translateX(16px)}}
+     .tongue-anim{animation:tright 1.4s ease-in-out infinite;transform-origin:128px 140px;}`
+  );
+}
+function tongueCircSVG(){
+  return tongueBase(
+    `<g class="tongue-anim">
+      <ellipse fill="#FF6B6B" cx="100" cy="130" rx="14" ry="10"/>
+    </g>`,
+    `@keyframes tcirc{
+      0%{transform:translate(0,0)} 25%{transform:translate(18px,0)}
+      50%{transform:translate(0,14px)} 75%{transform:translate(-18px,0)} 100%{transform:translate(0,0)}
+    }
+    .tongue-anim{animation:tcirc 2s linear infinite;transform-origin:100px 130px;}`
+  );
+}
+function tongueInOutSVG(){
+  return tongueBase(
+    `<g class="tongue-anim">
+      <ellipse fill="#FF6B6B" cx="100" cy="145" rx="14" ry="16"/>
+      <ellipse fill="#FF4488" cx="100" cy="158" rx="10" ry="8"/>
+    </g>`,
+    `@keyframes tinout{0%,100%{transform:scaleY(0) translateY(0)}
+      50%{transform:scaleY(1) translateY(0)}}
+     .tongue-anim{animation:tinout 1s ease-in-out infinite;transform-origin:100px 136px;}`
+  );
+}
+function tonguePaladarSVG(){
+  return faceSVG(
+    `<path fill="none" stroke="#FF6B6B" stroke-width="4" stroke-linecap="round" d="M72,135 Q100,155 128,135"/>
+     <rect fill="#fff" x="76" y="132" width="48" height="8" rx="3"/>
+     <path class="tongue-anim" fill="#FF6B6B" d="M86,132 Q100,112 114,132 Q100,128 86,132Z"/>`,
+    '',
+    `@keyframes tpal{0%,100%{opacity:.4}50%{opacity:1}}
+     .tongue-anim{animation:tpal 1.5s ease-in-out infinite;}`
+  );
+}
+
+/* cheeks */
+function puffBothSVG(){
+  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    @keyframes puff{0%,100%{rx:82;ry:82}50%{rx:96;ry:88}}
+    .face{fill:#FFD93D;stroke:#FF922B;stroke-width:3;animation:puff 1.5s ease-in-out infinite;}
+    .eye{fill:#333;} .cheek{fill:#FFB3B3;}
+    @keyframes cheekpuff{0%,100%{rx:22;ry:14}50%{rx:32;ry:22}}
+    .cheek{animation:cheekpuff 1.5s ease-in-out infinite;}
+  </style>
+  <ellipse class="face" cx="100" cy="100" rx="82" ry="82"/>
+  <ellipse class="cheek" cx="42" cy="115" rx="22" ry="14"/>
+  <ellipse class="cheek" cx="158" cy="115" rx="22" ry="14"/>
+  <ellipse class="eye" cx="72" cy="80" rx="10" ry="11"/>
+  <ellipse class="eye" cx="128" cy="80" rx="10" ry="11"/>
+  <ellipse fill="#fff" cx="76" cy="76" rx="3" ry="3"/>
+  <ellipse fill="#fff" cx="132" cy="76" rx="3" ry="3"/>
+  <path fill="#FF6B6B" stroke="none" d="M82,138 Q100,145 118,138 Q100,148 82,138Z"/>
+</svg>`;
+}
+function puffOneSVG(){
+  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .face{fill:#FFD93D;stroke:#FF922B;stroke-width:3;}
+    .eye{fill:#333;}
+    @keyframes lr{0%,45%,100%{transform:translateX(0)}50%,95%{transform:translateX(0)}
+      22%{transform:translateX(-12px)}72%{transform:translateX(12px)}}
+    .cheek-ball{fill:#FFD93D;stroke:#FF922B;stroke-width:2;animation:lr 3s ease-in-out infinite;}
+  </style>
+  <circle class="face" cx="100" cy="100" r="82"/>
+  <ellipse class="eye" cx="72" cy="80" rx="10" ry="11"/>
+  <ellipse class="eye" cx="128" cy="80" rx="10" ry="11"/>
+  <ellipse fill="#fff" cx="76" cy="76" rx="3" ry="3"/>
+  <ellipse fill="#fff" cx="132" cy="76" rx="3" ry="3"/>
+  <ellipse class="cheek-ball" cx="100" cy="118" rx="28" ry="20"/>
+  <path fill="#FF6B6B" d="M82,138 Q100,145 118,138 Q100,148 82,138Z"/>
+</svg>`;
+}
+function suckSVG(){
+  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    @keyframes suck{0%,100%{rx:82;ry:82}50%{rx:72;ry:80}}
+    .face{fill:#FFD93D;stroke:#FF922B;stroke-width:3;animation:suck 1.5s ease-in-out infinite;}
+    .eye{fill:#333;}
+    @keyframes scav{0%,100%{rx:22;ry:14}50%{rx:12;ry:8}}
+    .succ{fill:#FFB3B3;animation:scav 1.5s ease-in-out infinite;}
+  </style>
+  <ellipse class="face" cx="100" cy="100" rx="82" ry="82"/>
+  <ellipse class="succ" cx="58" cy="115" rx="22" ry="14"/>
+  <ellipse class="succ" cx="142" cy="115" rx="22" ry="14"/>
+  <ellipse class="eye" cx="72" cy="80" rx="10" ry="11"/>
+  <ellipse class="eye" cx="128" cy="80" rx="10" ry="11"/>
+  <ellipse fill="#fff" cx="76" cy="76" rx="3" ry="3"/>
+  <ellipse fill="#fff" cx="132" cy="76" rx="3" ry="3"/>
+  <path fill="none" stroke="#FF6B6B" stroke-width="4" stroke-linecap="round" d="M78,135 Q100,128 122,135"/>
+</svg>`;
+}
+
+/* soplo */
+function blowBase(breathEl, animStyle){
+  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .face{fill:#FFD93D;stroke:#FF922B;stroke-width:3;}
+    .eye{fill:#333;} .cheek{fill:#FFB3B3;opacity:.6;}
+    ${animStyle}
+  </style>
+  <circle class="face" cx="85" cy="100" r="70"/>
+  <ellipse class="cheek" cx="48" cy="115" rx="18" ry="12"/>
+  <ellipse class="cheek" cx="122" cy="115" rx="18" ry="12"/>
+  <ellipse class="eye" cx="62" cy="82" rx="9" ry="10"/>
+  <ellipse class="eye" cx="108" cy="82" rx="9" ry="10"/>
+  <ellipse fill="#fff" cx="66" cy="78" rx="3" ry="3"/>
+  <ellipse fill="#fff" cx="112" cy="78" rx="3" ry="3"/>
+  <ellipse fill="#FF6B6B" cx="85" cy="120" rx="10" ry="7"/>
+  ${breathEl}
+</svg>`;
+}
+function blowHardSVG(){
+  return blowBase(
+    `<g class="breath">
+      <ellipse fill="#74C0FC" cx="145" cy="115" rx="22" ry="8" opacity=".8"/>
+      <ellipse fill="#74C0FC" cx="168" cy="108" rx="14" ry="6" opacity=".6"/>
+      <ellipse fill="#74C0FC" cx="168" cy="122" rx="14" ry="6" opacity=".6"/>
+    </g>`,
+    `@keyframes blow{0%{transform:translateX(0);opacity:.9}100%{transform:translateX(24px);opacity:0}}
+     .breath{animation:blow .9s ease-out infinite;transform-origin:155px 115px;}`
+  );
+}
+function blowSoftSVG(){
+  return blowBase(
+    `<ellipse class="breath" fill="#74C0FC" cx="140" cy="118" rx="12" ry="5" opacity=".6"/>`,
+    `@keyframes softblow{0%{transform:translateX(0);opacity:.6}100%{transform:translateX(18px);opacity:0}}
+     .breath{animation:softblow 1.8s ease-out infinite;}`
+  );
+}
+function candleSVG(){
+  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .face{fill:#FFD93D;stroke:#FF922B;stroke-width:3;}
+    .eye{fill:#333;} .cheek{fill:#FFB3B3;opacity:.6;}
+    @keyframes flame{0%,100%{transform:scaleY(1) translateX(0)}50%{transform:scaleY(0.6) translateX(4px)}}
+    .flame{animation:flame .6s ease-in-out infinite;transform-origin:158px 80px;}
+    @keyframes breath{0%,80%{opacity:0;transform:translateX(0)}40%{opacity:.7;transform:translateX(10px)}100%{opacity:0;transform:translateX(22px)}}
+    .puff{animation:breath 1.8s ease-out infinite;}
+  </style>
+  <!-- face -->
+  <circle class="face" cx="78" cy="108" r="65"/>
+  <ellipse class="cheek" cx="44" cy="120" rx="16" ry="11"/>
+  <ellipse class="cheek" cx="112" cy="120" rx="16" ry="11"/>
+  <ellipse class="eye" cx="58" cy="90" rx="8" ry="9"/>
+  <ellipse class="eye" cx="98" cy="90" rx="8" ry="9"/>
+  <ellipse fill="#fff" cx="62" cy="86" rx="2.5" ry="2.5"/>
+  <ellipse fill="#fff" cx="102" cy="86" rx="2.5" ry="2.5"/>
+  <ellipse fill="#FF6B6B" cx="78" cy="128" rx="9" ry="6"/>
+  <!-- puff -->
+  <ellipse class="puff" fill="#74C0FC" cx="130" cy="126" rx="10" ry="5" opacity=".7"/>
+  <!-- candle -->
+  <rect fill="#fff" stroke="#ddd" stroke-width="1" x="150" y="100" width="16" height="70" rx="4"/>
+  <!-- flame -->
+  <g class="flame">
+    <ellipse fill="#FFD93D" cx="158" cy="90" rx="7" ry="12"/>
+    <ellipse fill="#FF922B" cx="158" cy="94" rx="4" ry="8"/>
+    <ellipse fill="#fff" cx="158" cy="98" rx="2" ry="3"/>
+  </g>
+</svg>`;
+}
+
+/* mandíbula */
+function wideOpenSVG(){
+  return openCloseSVG(); // same animation, wider
+}
+function jawLateralSVG(){
+  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .face{fill:#FFD93D;stroke:#FF922B;stroke-width:3;}
+    .eye{fill:#333;} .cheek{fill:#FFB3B3;opacity:.5;}
+    @keyframes lateral{0%,100%{transform:translateX(0)}33%{transform:translateX(-10px)}66%{transform:translateX(10px)}}
+    .jaw{animation:lateral 2s ease-in-out infinite;transform-origin:100px 145px;}
+  </style>
+  <circle class="face" cx="100" cy="95" r="80"/>
+  <ellipse class="cheek" cx="55" cy="108" rx="20" ry="13"/>
+  <ellipse class="cheek" cx="145" cy="108" rx="20" ry="13"/>
+  <ellipse class="eye" cx="72" cy="72" rx="10" ry="11"/>
+  <ellipse class="eye" cx="128" cy="72" rx="10" ry="11"/>
+  <ellipse fill="#fff" cx="76" cy="68" rx="3" ry="3"/>
+  <ellipse fill="#fff" cx="132" cy="68" rx="3" ry="3"/>
+  <rect fill="#fff" stroke="#ddd" stroke-width="1" x="72" y="116" width="56" height="9" rx="3"/>
+  <g class="jaw">
+    <rect fill="#fff" stroke="#ddd" stroke-width="1" x="72" y="128" width="56" height="9" rx="3"/>
+    <path fill="#FFD93D" stroke="#FF922B" stroke-width="3" d="M68,133 Q100,162 132,133 L132,155 Q100,172 68,155Z"/>
+    <ellipse fill="#FF6B6B" cx="100" cy="148" rx="18" ry="11"/>
+  </g>
+</svg>`;
+}
+function chewSVG(){
+  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .face{fill:#FFD93D;stroke:#FF922B;stroke-width:3;}
+    .eye{fill:#333;} .cheek{fill:#FFB3B3;opacity:.5;}
+    @keyframes chew{
+      0%,100%{transform:translateY(0) translateX(0)}
+      25%{transform:translateY(8px) translateX(-4px)}
+      50%{transform:translateY(0) translateX(0)}
+      75%{transform:translateY(8px) translateX(4px)}
+    }
+    .jaw{animation:chew 1.2s ease-in-out infinite;transform-origin:100px 140px;}
+    @keyframes eyechew{0%,100%{transform:scaleY(1)}25%,75%{transform:scaleY(0.7)}}
+    .eye{animation:eyechew 1.2s ease-in-out infinite;transform-origin:100px 80px;}
+  </style>
+  <circle class="face" cx="100" cy="95" r="80"/>
+  <ellipse class="cheek" cx="55" cy="108" rx="20" ry="13"/>
+  <ellipse class="cheek" cx="145" cy="108" rx="20" ry="13"/>
+  <ellipse class="eye" cx="72" cy="75" rx="10" ry="11"/>
+  <ellipse class="eye" cx="128" cy="75" rx="10" ry="11"/>
+  <rect fill="#fff" stroke="#ddd" x="72" y="116" width="56" height="9" rx="3"/>
+  <g class="jaw">
+    <rect fill="#fff" stroke="#ddd" x="72" y="128" width="56" height="9" rx="3"/>
+    <path fill="#FFD93D" stroke="#FF922B" stroke-width="3" d="M68,133 Q100,162 132,133 L132,155 Q100,172 68,155Z"/>
+    <ellipse fill="#FF6B6B" cx="100" cy="148" rx="18" ry="11"/>
+  </g>
+</svg>`;
+}
+
+/* ════ STATE ════ */
+let currentExIdx = 0;
+let timerDuration = 3;
+let timerRemaining = 3;
+let timerRunning = false;
+let timerInterval = null;
+const CIRC = 276.5; // 2π × 44
+
+/* ════ BUILD MENU ════ */
+function buildMenu(){
+  const menu = document.getElementById('menu');
+  menu.innerHTML = '';
+
+  const cats = {};
+  EXERCISES.forEach((ex,i)=>{
+    if(!cats[ex.cat]) cats[ex.cat]={color:ex.color,items:[]};
+    cats[ex.cat].items.push({ex,i});
+  });
+
+  Object.entries(cats).forEach(([cat,{color,items}])=>{
+    const sec = document.createElement('div');
+    sec.className = 'cat-section';
+    sec.innerHTML = `<div class="cat-title" style="color:${color}">${cat}</div>`;
+    const grid = document.createElement('div');
+    grid.className = 'exercise-grid';
+    items.forEach(({ex,i})=>{
+      const btn = document.createElement('button');
+      btn.className = 'ex-btn';
+      btn.style.background = `linear-gradient(135deg,${ex.color},${ex.color}bb)`;
+      btn.innerHTML = `<span class="ex-icon">${cat.split(' ')[0]}</span>
+                       <span class="ex-label">${ex.name}</span>`;
+      btn.onclick = ()=>openEx(i);
+      grid.appendChild(btn);
+    });
+    sec.appendChild(grid);
+    menu.appendChild(sec);
+  });
+}
+
+/* ════ OPEN EXERCISE ════ */
+function openEx(idx){
+  currentExIdx = idx;
+  document.getElementById('menu').style.display = 'none';
+  document.getElementById('ex-screen').classList.add('active');
+  document.getElementById('back-btn').style.display = 'flex';
+  resetTimer();
+  renderEx();
+}
+
+function goMenu(){
+  stopTimer();
+  document.getElementById('menu').style.display = 'block';
+  document.getElementById('ex-screen').classList.remove('active');
+  document.getElementById('back-btn').style.display = 'none';
+}
+
+function exNav(dir){
+  currentExIdx = (currentExIdx + dir + EXERCISES.length) % EXERCISES.length;
+  resetTimer();
+  renderEx();
+}
+
+function renderEx(){
+  const ex = EXERCISES[currentExIdx];
+  document.getElementById('ex-title').textContent = ex.name;
+  document.getElementById('ex-instruction').textContent = ex.instruction;
+  document.getElementById('ex-tip').textContent = ex.tip;
+  document.getElementById('ex-svg-wrap').innerHTML = ex.svg();
+  document.getElementById('timer-arc').style.stroke = ex.color;
+  // speak instruction
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(ex.name + '. ' + ex.instruction);
+  u.lang='es-ES'; u.rate=0.85; u.pitch=1.1;
+  speechSynthesis.speak(u);
+}
+
+/* ════ TIMER ════ */
+function setDur(s, btn){
+  timerDuration = s;
+  timerRemaining = s;
+  document.querySelectorAll('.dur-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  updateTimerDisplay();
+  stopTimer();
+}
+
+function startTimer(){
+  if(timerRunning) return;
+  if(timerRemaining <= 0){ timerRemaining = timerDuration; }
+  timerRunning = true;
+  document.getElementById('btn-start').textContent = '⏸ Pausar';
+  document.getElementById('btn-start').onclick = pauseTimer;
+  timerInterval = setInterval(()=>{
+    timerRemaining -= 0.05;
+    if(timerRemaining <= 0){
+      timerRemaining = 0;
+      updateTimerDisplay();
+      stopTimer();
+      showToast('🎉 ¡Muy bien!');
+      // speak praise
+      const u=new SpeechSynthesisUtterance('¡Muy bien Claudia!');
+      u.lang='es-ES';u.rate=0.9;u.pitch=1.3;speechSynthesis.speak(u);
+    } else {
+      updateTimerDisplay();
+    }
+  }, 50);
+}
+
+function pauseTimer(){
+  timerRunning = false;
+  clearInterval(timerInterval);
+  document.getElementById('btn-start').textContent = '▶ Continuar';
+  document.getElementById('btn-start').onclick = startTimer;
+}
+
+function stopTimer(){
+  timerRunning = false;
+  clearInterval(timerInterval);
+  document.getElementById('btn-start').textContent = '▶ Empezar';
+  document.getElementById('btn-start').onclick = startTimer;
+}
+
+function resetTimer(){
+  stopTimer();
+  timerRemaining = timerDuration;
+  updateTimerDisplay();
+}
+
+function updateTimerDisplay(){
+  const pct = timerRemaining / timerDuration;
+  const offset = CIRC * (1 - pct);
+  document.getElementById('timer-arc').style.strokeDashoffset = offset;
+  document.getElementById('timer-count').textContent = Math.ceil(timerRemaining);
+}
+
+/* ════ TOAST ════ */
+let toastT;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='show';
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>t.className='',2200);
+}
+
+/* ════ INIT ════ */
+buildMenu();
+</script>
+</body>
+</html>
