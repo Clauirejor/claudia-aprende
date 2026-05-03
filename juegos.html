@@ -118,12 +118,22 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;overf
 .c1{background:#FF6B6B;}.c2{background:#FF922B;}.c3{background:#FFCA3A;color:#555!important;}
 .c4{background:#6BCB77;}.c5{background:#20C997;}.c6{background:#4D96FF;}
 .c7{background:#CC5DE8;}.c8{background:#F06595;}.c9{background:#74C0FC;}
+
+#home-btn{
+  width:52px;height:52px;border-radius:50%;border:none;
+  background:#4D96FF;color:#fff;font-size:1.4rem;cursor:pointer;
+  box-shadow:0 4px 10px rgba(77,150,255,.4);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .15s;text-decoration:none;
+}
+#home-btn:active{transform:scale(.92);}
 </style>
 </head>
 <body>
 
 <div id="app-header">
   <button id="back-btn" onclick="goMenu()">◀</button>
+  <a id="home-btn" href="index.html" title="Inicio">🏠</a>
   <div id="app-title">🎮 Juegos</div>
   <div id="score-badge">⭐ 0</div>
 </div>
